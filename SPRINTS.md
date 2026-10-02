@@ -3,7 +3,7 @@
 ## Sprint Backlog - Sprint 1: Cimientos de la Plataforma
 **Duración:** 28 de Septiembre - 11 de Octubre
 
-- [ ] **TT-3**: Crear wireframes y mockups en Figma para el panel docente y la vista de proyección.
+- [ ] **TT-3**: Crear wireframes y mockups en  para el panel docente y la vista de proyección.
 - [ ] **TT-3**: Definir paleta de colores y tipografía de alta legibilidad para el contexto de 3° básico.
 - [ ] **HU-1**: Maquetar la vista de Login de docentes y los componentes de UI.
 - [ ] **HU-1**: Configurar la base de datos y desarrollar el endpoint backend de autenticación.
