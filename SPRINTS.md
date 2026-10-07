@@ -8,7 +8,7 @@
 - [ ] **HU-1**: Maquetar la vista de Login de docentes y los componentes de UI. *(Resp: Diego Vargas | 4 hrs)*
 - [ ] **HU-1**: Configurar la base de datos y desarrollar el endpoint backend de autenticación. *(Resp: Diego Oyarzo | 4 hrs)*
 - [x] **EP-2**: Diseñar el modelo relacional y las restricciones de tablas para el contenido del MINEDUC. *(Resp: Diego Oyarzo | 5 hrs)*
-- [ ] **EP-2**: Poblar la base de datos con el primer set de textos de comprensión lectora. *(Resp: Diego Oyarzo | 4 hrs)*
+- [x] **EP-2**: Poblar la base de datos con el primer set de textos de comprensión lectora. *(Resp: Diego Oyarzo | 4 hrs)*
 - [ ] **HU-4**: Maquetar el dashboard principal estructurando menús de navegación lateral. *(Resp: Diego Vargas | 3 hrs)*
 - [ ] **HU-4**: Configurar el enrutamiento interno para transiciones fluidas sin recargar la página. *(Resp: Diego Vargas | 6 hrs)*
 - [ ] **HU-5**: Implementar la API de JavaScript para forzar la pantalla completa en modo proyección. *(Resp: Diego Vargas | 4 hrs)*
