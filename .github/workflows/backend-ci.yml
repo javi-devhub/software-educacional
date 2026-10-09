@@ -1,0 +1,85 @@
+name: Backend CI
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "backend/**"
+      - "database/**"
+      - ".github/workflows/backend-ci.yml"
+
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/**"
+      - "database/**"
+      - ".github/workflows/backend-ci.yml"
+
+jobs:
+  backend-check:
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.4
+
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_ROOT_HOST: "%"
+
+        ports:
+          - 3306:3306
+
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -proot"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+
+    env:
+      DB_HOST: 127.0.0.1
+      DB_PORT: 3306
+      DB_NAME: plataforma_educativa
+      DB_USER: root
+      DB_PASSWORD: root
+
+    steps:
+      - name: Descargar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt
+
+      - name: Comprobar sintaxis del backend
+        run: |
+          python -m compileall backend
+
+      - name: Comprobar FastAPI
+        run: |
+          python -c "import sys; sys.path.insert(0, 'backend'); import main; assert main.app.title == 'Plataforma Educativa'"
+
+      - name: Instalar cliente MySQL
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y default-mysql-client
+
+      - name: Crear esquema de base de datos
+        run: |
+          mysql -h127.0.0.1 -uroot -proot < database/schema.sql
+
+      - name: Comprobar tablas creadas
+        run: |
+          mysql -h127.0.0.1 -uroot -proot -e "USE plataforma_educativa; SHOW TABLES;"
+
+      - name: Probar conexión Python con MySQL
+        run: |
+          python -c "import sys; sys.path.insert(0, 'backend'); from database import get_connection; c=get_connection(); cur=c.cursor(); cur.execute('SELECT DATABASE()'); assert cur.fetchone()[0] == 'plataforma_educativa'; cur.close(); c.close(); print('Conexion MySQL correcta')"
