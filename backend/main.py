@@ -1,5 +1,7 @@
+import os
 import bcrypt
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 
 from database import get_connection
 from schemas import LoginRequest
@@ -8,6 +10,16 @@ from schemas import LoginRequest
 app = FastAPI(
     title="Plataforma Educativa",
     version="1.0.0"
+)
+
+# CORS configuration para permitir requests desde el frontend
+cors_origins = os.getenv("CORS_ORIGINS", "http://localhost:5173,http://localhost:8000").split(",")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 

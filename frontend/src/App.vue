@@ -1,20 +1,26 @@
 <script setup>
 import { computed, watchEffect } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import SideNav from './components/SideNav.vue'
 import { useAppStore } from './stores/app'
 import { APP_NAME, ASIGNATURA } from './config'
 
 const route = useRoute()
+const router = useRouter()
 const store = useAppStore()
 const fullscreen = computed(() => !!route.meta.fullscreen)
 
 // Tamaño del texto configurable por la docente
 watchEffect(() => document.documentElement.style.setProperty('--read', store.readSize + 'px'))
+
+function salir() {
+  store.logout()
+  router.replace({ name: 'login' })
+}
 </script>
 
 <template>
-  <!-- Modo proyección: sin barra ni menú de administración -->
+  <!-- Login y modo proyección: sin barra ni menú de administración -->
   <RouterView v-if="fullscreen" />
 
   <div v-else class="app">
@@ -23,9 +29,12 @@ watchEffect(() => document.documentElement.style.setProperty('--read', store.rea
         🔢 {{ APP_NAME }}
         <small>{{ ASIGNATURA }} · {{ store.curso }}</small>
       </div>
-      <div class="who">
-        {{ store.docente.nombre }}
-        <small>{{ store.docente.rol }}</small>
+      <div class="right">
+        <div v-if="store.docente" class="who">
+          {{ store.docente.nombre }}
+          <small>{{ store.docente.rol }}</small>
+        </div>
+        <button class="salir" @click="salir">Cerrar sesión</button>
       </div>
     </header>
     <div class="shell">
@@ -47,8 +56,11 @@ watchEffect(() => document.documentElement.style.setProperty('--read', store.rea
 .logo { font: 700 22px var(--font-title); }
 .logo small, .who small { display: block; font: 600 14px var(--font-body); }
 .logo small { margin-top: -4px; }
+.right { display: flex; align-items: center; gap: 16px; }
 .who { font-weight: 700; text-align: right; }
 .who small { font-weight: 400; }
+.salir { background: transparent; color: #fff; border: 2px solid #fff; border-radius: 12px; padding: 6px 14px; font: 700 14px var(--font-body); cursor: pointer; }
+.salir:hover { background: rgba(255, 255, 255, .18); }
 .shell { flex: 1; width: 100%; max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 200px 1fr; }
 .main { padding: 20px; min-width: 0; }
 @media (max-width: 820px) { .shell { grid-template-columns: 1fr; } }

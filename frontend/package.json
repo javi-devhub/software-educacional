@@ -1,5 +1,5 @@
 {
-  "name": "contar-y-crecer",
+  "name": "leer-y-crecer",
   "private": true,
   "version": "0.1.0",
   "type": "module",
@@ -14,7 +14,7 @@
     "vue-router": "^4.4.0"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^6.0.10",
+    "@vitejs/plugin-vue": "^6.0.0",
     "vite": "^8.3.4"
   }
 }
