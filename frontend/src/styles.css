@@ -1,0 +1,59 @@
+/* Paleta viva para Matemática: base violeta + un color por eje curricular.
+   Reglas de contraste: texto blanco solo sobre --brand-primary (6,1:1);
+   el amarillo de acción lleva texto oscuro (9,8:1); los colores de eje se usan en bordes, íconos y puntos,
+   y su variante oscura (--ink) para texto sobre el tono claro (--tint). */
+:root {
+  --bg-main: #FFF7E6;
+  --bg-surface: #FFFFFF;
+  --border-card: #E3E6FF;
+  --text-main: #1B1F4B;
+  --text-muted: #5B6285;
+  --brand-primary: #5B3DF5;
+  --brand-primary-hover: #4527D8;
+  --action-cta: #FFC400; /* solo avanzar, enviar respuestas y premios; texto oscuro encima */
+  --action-cta-hover: #FFB000;
+  --feedback-success: #12C46B;
+  --feedback-alert: #FF4D6D;
+  --star: #FFB400;
+  --read: 22px;
+  --font-body: 'Nunito', system-ui, sans-serif;
+  --font-title: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #app { min-height: 100%; }
+body { margin: 0; background: var(--bg-main); color: var(--text-main); font: 400 17px/1.5 var(--font-body); }
+h1, h2, h3, h4 { font-family: var(--font-title); margin: 0; line-height: 1.15; }
+p { margin: 0; }
+button { font-family: inherit; }
+:focus-visible { outline: 3px solid var(--text-main); outline-offset: 2px; }
+
+.btn { border: 0; border-radius: 16px; padding: 12px 20px; font: 800 18px var(--font-body); cursor: pointer; transition: transform .1s, background .15s; }
+.btn:hover:not(:disabled) { transform: translateY(-1px); }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.btn-pri { background: var(--brand-primary); color: #fff; box-shadow: 0 3px 0 var(--brand-primary-hover); }
+.btn-pri:hover:not(:disabled) { background: var(--brand-primary-hover); }
+.btn-sec { background: #fff; color: var(--text-main); border: 2px solid var(--brand-primary); padding: 8px 14px; font-size: 16px; border-radius: 12px; }
+.btn-sec:hover:not(:disabled) { background: #F0EBFF; }
+.btn-cta { background: var(--action-cta); color: var(--text-main); font-weight: 800; font-size: 20px; box-shadow: 0 3px 0 #E0A800; }
+.btn-cta:hover:not(:disabled) { background: var(--action-cta-hover); }
+.btn-ghost { background: #fff; color: var(--text-main); border: 2px solid var(--border-card); font-size: 20px; }
+.btn-ghost:hover:not(:disabled) { border-color: var(--brand-primary); }
+
+.chip { background: #fff; border: 2px solid var(--border-card); border-radius: 99px; padding: 6px 14px; font: 700 16px var(--font-body); cursor: pointer; color: var(--text-main); display: inline-flex; align-items: center; gap: 8px; }
+.chip:hover { border-color: var(--brand-primary); }
+.chip.on { background: var(--brand-primary); border-color: var(--brand-primary); color: #fff; }
+
+.card { background: var(--bg-surface); border: 2px solid var(--border-card); border-radius: 18px; padding: 16px; }
+.kind { display: inline-block; background: #EEE9FF; color: #3A21B0; font-weight: 800; font-size: 14px; border-radius: 99px; padding: 2px 10px; }
+.bar { height: 14px; background: var(--border-card); border-radius: 99px; overflow: hidden; }
+.bar > i { display: block; height: 100%; background: linear-gradient(90deg, #12C46B, #0BB37F); border-radius: 99px; transition: width .3s; }
+.stars { font-size: 30px; letter-spacing: 4px; color: var(--star); }
+.stars .off { color: var(--border-card); }
+.muted { color: var(--text-muted); }
+
+.fade-enter-active, .fade-leave-active { transition: opacity .15s; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
