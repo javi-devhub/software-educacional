@@ -1,15 +1,14 @@
-
 USE plataforma_educativa;
 START TRANSACTION;
 
--- Datos válidos base
+-- Datos válidos base (requiere haber ejecutado schema.sql: los tipos ya vienen cargados)
 INSERT INTO docente (nombre, nickname, contrasena_hash, rol)
 VALUES ('Veronica', 'Pveronica', '$2b$12$abcdefghijklmnopqrstuuabcdefghijklmnopqrstuvwxyz0123', 'docente');
-INSERT INTO tipo_contenido (nombre_tipo) VALUES ('Comprensión lectora');
-SET @tipo = LAST_INSERT_ID();
-INSERT INTO objetivo_aprendizaje (codigo_oa, descripcion, nivel) VALUES ('OA 04', 'Leer textos', '3° básico');
+SET @tipo = (SELECT id_tipo FROM tipo_contenido WHERE nombre_tipo = 'Encuesta y tabla de datos');
+-- OA de prueba (se revierte con el ROLLBACK final). Asignatura, eje y nivel toman sus valores por defecto.
+INSERT INTO objetivo_aprendizaje (codigo_oa, descripcion) VALUES ('OA 90', 'OA de prueba: construir y leer gráficos');
 SET @oa = LAST_INSERT_ID();
-INSERT INTO contenido (titulo, recurso, id_tipo) VALUES ('El zorro y el bosque', 'texto...', @tipo);
+INSERT INTO contenido (titulo, recurso, id_tipo) VALUES ('Encuesta: mi mascota favorita', 'recurso...', @tipo);
 SET @cont = LAST_INSERT_ID();
 INSERT INTO contenido_oa VALUES (@cont, @oa);
 
@@ -28,7 +27,7 @@ INSERT INTO docente (nombre, nickname, contrasena_hash, rol)
 VALUES ('Otra', 'otra', '1234', 'docente');
 
 -- [RI-03] tipo duplicado -> debe fallar (UNIQUE)
-INSERT INTO tipo_contenido (nombre_tipo) VALUES ('Comprensión lectora');
+INSERT INTO tipo_contenido (nombre_tipo) VALUES ('Encuesta y tabla de datos');
 
 -- [RI-04] id_tipo inexistente -> debe fallar (FK)
 INSERT INTO contenido (titulo, recurso, id_tipo) VALUES ('X', 'url', 99999);
@@ -44,7 +43,7 @@ INSERT INTO contenido (titulo, recurso, estado, id_tipo) VALUES ('Algo', 'url', 
 INSERT INTO contenido (titulo, recurso, estado, id_tipo) VALUES ('Algo', 'url', 'borrado', @tipo);
 
 -- [RI-08] código OA duplicado -> debe fallar
-INSERT INTO objetivo_aprendizaje (codigo_oa, descripcion, nivel) VALUES ('OA 04', 'otro', '3° básico');
+INSERT INTO objetivo_aprendizaje (codigo_oa, descripcion) VALUES ('OA 90', 'otro');
 
 -- [RI-09] nivel vacío -> debe fallar
 INSERT INTO objetivo_aprendizaje (codigo_oa, descripcion, nivel) VALUES ('OA 99', 'otro', '');
@@ -61,6 +60,21 @@ INSERT INTO contenido_oa VALUES (@cont, 99999);
 -- [RI-13] estado por defecto -> debe devolver 'activo' (sin error)
 SELECT 'RI-13 (esperado: activo)' AS prueba, estado FROM contenido WHERE id_contenido = @cont;
 
+-- [RI-17] asignatura distinta de Matemática -> debe fallar
+INSERT INTO objetivo_aprendizaje (codigo_oa, descripcion, asignatura) VALUES ('OA 92', 'otro', 'Lenguaje y Comunicación');
+
+-- [RI-18] eje distinto de Datos y probabilidades -> debe fallar
+INSERT INTO objetivo_aprendizaje (codigo_oa, descripcion, eje) VALUES ('OA 93', 'otro', 'Geometría');
+
+-- [RI-19] nivel distinto de 3° básico -> debe fallar
+INSERT INTO objetivo_aprendizaje (codigo_oa, descripcion, nivel) VALUES ('OA 94', 'otro', '4° básico');
+
+-- [RI-20] tipo de contenido que no es de Matemática -> debe fallar
+INSERT INTO tipo_contenido (nombre_tipo) VALUES ('Comprensión lectora');
+
+-- [RI-21] código OA con formato inválido -> debe fallar
+INSERT INTO objetivo_aprendizaje (codigo_oa, descripcion) VALUES ('LE-04', 'otro');
+
 -- [RI-16] borrar tipo con contenidos -> debe fallar (RESTRICT)
 DELETE FROM tipo_contenido WHERE id_tipo = @tipo;
 
@@ -69,7 +83,7 @@ DELETE FROM objetivo_aprendizaje WHERE id_oa = @oa;
 SELECT 'RI-15 (esperado: 0)' AS prueba, COUNT(*) AS vinculos_restantes FROM contenido_oa WHERE id_oa = @oa;
 
 -- [RI-14] borrar un contenido borra sus vínculos (sin error, devuelve 0)
-INSERT INTO objetivo_aprendizaje (codigo_oa, descripcion, nivel) VALUES ('OA 05', 'Leer', '3° básico');
+INSERT INTO objetivo_aprendizaje (codigo_oa, descripcion) VALUES ('OA 91', 'OA de prueba 2');
 SET @oa2 = LAST_INSERT_ID();
 INSERT INTO contenido_oa VALUES (@cont, @oa2);
 DELETE FROM contenido WHERE id_contenido = @cont;
