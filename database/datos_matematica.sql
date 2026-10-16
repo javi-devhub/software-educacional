@@ -13,8 +13,8 @@ USE plataforma_educativa;
 DELETE FROM contenido WHERE JSON_VALID(recurso) AND JSON_EXTRACT(recurso, '$.capitulo') = 11;
 
 -- Objetivo de Aprendizaje (Bases Curriculares MINEDUC, Matemática 3° básico, Datos y probabilidades)
-INSERT INTO objetivo_aprendizaje (codigo_oa, descripcion) VALUES
-('OA 25', 'Construir, leer e interpretar pictogramas y gráficos de barra simple con escala, en base a información recolectada o dada.')
+INSERT INTO objetivo_aprendizaje (codigo_oa, descripcion, nivel) VALUES
+('OA 25', 'Construir, leer e interpretar pictogramas y gráficos de barra simple con escala, en base a información recolectada o dada.', '3° básico')
 ON DUPLICATE KEY UPDATE descripcion = VALUES(descripcion);
 
 SET @oa = (SELECT id_oa FROM objetivo_aprendizaje WHERE codigo_oa = 'OA 25');
@@ -62,10 +62,10 @@ INSERT INTO contenido (titulo, descripcion, recurso, id_tipo) VALUES
 ('Repaso del capítulo 11 (1/2): pictograma y diagrama de puntos', 'A partir de una tabla de libros vendidos se completan un pictograma (símbolo = 1) y un diagrama de puntos.', '{"fuente":"Texto del estudiante, Matemática 3° básico","capitulo":11,"pagina":420,"datos":{"titulo_tabla":"Ventas de un fin de semana","filas":[{"categoria":"cuentos","total":4},{"categoria":"novelas","total":6},{"categoria":"libros infantiles","total":8},{"categoria":"diccionarios","total":2}],"valor_simbolo":1}}', @t_cre),
 ('Repaso del capítulo 11 (2/2): gráfico de barra con escala', 'A partir de una tabla de revistas vendidas se completa un gráfico de barra con escala y se responden 2 preguntas.', '{"fuente":"Texto del estudiante, Matemática 3° básico","capitulo":11,"pagina":421,"datos":{"titulo_tabla":"Ventas de revistas en una semana","filas":[{"categoria":"autos","total":30},{"categoria":"deporte","total":40},{"categoria":"ciencia","total":50},{"categoria":"actualidad","total":20},{"categoria":"farándula","total":20}],"num_preguntas":2}}', @t_cre);
 
--- Vincular todas las actividades del capítulo 11 con el OA 25
-INSERT IGNORE INTO contenido_oa (id_contenido, id_oa)
-SELECT id_contenido, @oa FROM contenido
-WHERE JSON_VALID(recurso) AND JSON_EXTRACT(recurso, '$.capitulo') = 11;
+-- TT-10: la asociación con los OA se hace mediante tt10_actualizar_oa.sql.
+-- No asignar indiscriminadamente el OA 25: hay encuestas, diagramas de puntos
+-- y experimentos aleatorios que también corresponden a los OA 23, 26 y 24.
+-- Ejecutar tt10_actualizar_oa.sql después de esta carga (o de cada recarga).
 
 -- Verificación: cantidad de actividades por etapa (debe sumar 36)
 SELECT t.nombre_tipo AS etapa, COUNT(*) AS actividades

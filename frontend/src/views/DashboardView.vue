@@ -53,14 +53,15 @@ const quick = computed(() => store.ultimaEtapa ? etapas.find(e => e.id === store
           <h3>{{ e.title }}</h3>
           <p>{{ e.desc }}</p>
           <span class="time" :style="{ color: e.color }">{{ e.minutes }} min</span>
-          <span class="oa">OA por validar</span>
+          <span class="oa">{{ e.oa.join(' · ') }}</span>
+          <span v-if="!e.oaValidado" class="oa-warning">Pendiente de validación docente</span>
         </div>
         
         <button class="btn-pri w-100" @click="launch(e.id)">Proyectar etapa {{ index + 1 }}</button>
       </div>
     </div>
 
-    <p class="note">Las etapas siguen las Bases Curriculares de Matemática de 3° básico. La plataforma no registra resultados de cada estudiante.</p>
+    <p class="note">Alineación curricular propuesta para Matemática 3° básico; pendiente de validación con la docente. La plataforma no registra resultados de cada estudiante.</p>
   </section>
 </template>
 
@@ -97,7 +98,8 @@ h1 { font-size: 28px; margin: 0 0 6px 0; color: #222; }
 .info h3 { font-size: 17px; margin: 0 0 8px 0; color: #222; line-height: 1.3; }
 .info p { font-size: 14px; margin: 0 0 16px 0; color: #666; line-height: 1.4; flex: 1; }
 .time { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
-.oa { font-size: 13px; color: #999; margin-bottom: 24px; }
+.oa { font-size: 13px; font-weight: 700; color: #3F3482; margin-bottom: 4px; }
+.oa-warning { font-size: 12px; color: #895A11; margin-bottom: 20px; }
 
 /* Nota a pie de página */
 .note { font-size: 13px; color: #777; text-align: left; margin-top: 16px; }
