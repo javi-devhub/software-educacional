@@ -3,10 +3,10 @@
 // Los temas, números y preguntas son ejemplos: confirmar con la docente. Cuando exista la base de datos (EP-2),
 // este archivo se reemplaza por un fetch a la API.
 export const etapas = [
-  { id: 'encuesta', title: 'Encuesta y tabla', short: 'Encuesta y tabla', emoji: '📝', minutes: 8, desc: 'Votamos entre todos y ordenamos los datos en una tabla.', color: '#2F6BFF', tint: '#E4ECFF', ink: '#1B3FB8' },
-  { id: 'graficos', title: 'Conocemos los gráficos', short: 'Conocemos gráficos', emoji: '📊', minutes: 6, desc: 'Descubrimos cómo se ve la información en un pictograma y en un gráfico de barras.', color: '#8B3DFF', tint: '#EFE4FF', ink: '#5B1FB8' },
-  { id: 'interpretar', title: 'Interpretamos la información', short: 'Interpretamos', emoji: '🔎', minutes: 8, desc: 'Leemos el gráfico y respondemos preguntas sobre los datos.', color: '#FF8A00', tint: '#FFEBD2', ink: '#8F4700' },
-  { id: 'crear', title: 'Creamos gráficos', short: 'Creamos gráficos', emoji: '✏️', minutes: 10, desc: 'Con una tabla de datos, construimos el gráfico de barras.', color: '#00A6C7', tint: '#D6F3FA', ink: '#045A6E' }
+  { id: 'encuesta', oa: ['MA03 OA 23'], oaValidado: false, title: 'Encuesta y tabla', short: 'Encuesta y tabla', emoji: '📝', minutes: 8, desc: 'Votamos entre todos y ordenamos los datos en una tabla.', color: '#2F6BFF', tint: '#E4ECFF', ink: '#1B3FB8' },
+  { id: 'graficos', oa: ['MA03 OA 25'], oaValidado: false, title: 'Conocemos los gráficos', short: 'Conocemos gráficos', emoji: '📊', minutes: 6, desc: 'Descubrimos cómo se ve la información en un pictograma y en un gráfico de barras.', color: '#8B3DFF', tint: '#EFE4FF', ink: '#5B1FB8' },
+  { id: 'interpretar', oa: ['MA03 OA 25'], oaValidado: false, title: 'Interpretamos la información', short: 'Interpretamos', emoji: '🔎', minutes: 8, desc: 'Leemos el gráfico y respondemos preguntas sobre los datos.', color: '#FF8A00', tint: '#FFEBD2', ink: '#8F4700' },
+  { id: 'crear', oa: ['MA03 OA 23', 'MA03 OA 25'], oaValidado: false, title: 'Creamos gráficos', short: 'Creamos gráficos', emoji: '✏️', minutes: 10, desc: 'Con una tabla de datos, construimos el gráfico de barras.', color: '#00A6C7', tint: '#D6F3FA', ink: '#045A6E' }
 ]
 export const etapaIndex = (id) => etapas.findIndex((e) => e.id === id)
 
