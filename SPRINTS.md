@@ -16,10 +16,9 @@
 
 ### ⚡ Sprint 2: Dinamización e Interactividad
 **Fecha:** 12 de Octubre - 25 de Octubre
-- [ ] `TT-10` Mapear los guiones de las cuatro etapas (encuesta, tabla de datos, interpretación y creación de gráficos) con los Objetivos de Aprendizaje de Datos de 3° básico — *@Diego Oyarzo* (4 hrs)
-- [ ] `HU-7` Programar la lógica base y las físicas del motor de juego 2D (Phaser) para la encuesta y la tabla de datos (ordenar las respuestas en filas y columnas) — *@Javiera Sobarzo* (8 hrs)
-- [ ] `HU-7` Integrar los assets gráficos (imágenes, botones) y los textos dentro de las escenas de la encuesta y la tabla de datos — *@Javiera Sobarzo* (5 hrs)
-- [ ] `HU-8` Desarrollar la presentación de los gráficos y las preguntas de interpretación de la información (lectura y comparación de datos) utilizando Phaser — *@Manuel Figueroa* (8 hrs)
+- [x] `HU-7` Programar la lógica base y las físicas del motor de juego 2D (Phaser) para la encuesta y la tabla de datos (ordenar las respuestas en filas y columnas) — *@Javiera Sobarzo* (8 hrs)
+- [x] `HU-7` Integrar los assets gráficos (imágenes, botones) y los textos dentro de las escenas de la encuesta y la tabla de datos — *@Javiera Sobarzo* (5 hrs)
+- [x] `HU-8` Desarrollar la presentación de los gráficos y las preguntas de interpretación de la información (lectura y comparación de datos) utilizando Phaser — *@Manuel Figueroa* (8 hrs)
 - [ ] `EP-9` Diseñar e implementar las animaciones y partículas de celebración para las retroalimentaciones grupales — *@Javiera Sobarzo* (5 hrs)
 - [ ] `HU-11` Desarrollar el componente de menú flotante rápido utilizando Vue 3 — *@Manuel Figueroa* (4 hrs)
 - [ ] `HU-11` Sincronizar el estado del componente en Vue 3 con la instancia activa de Phaser para transiciones sin recargar el navegador — *@Javiera Sobarzo* (6 hrs)
@@ -28,7 +27,7 @@
 
 ### 📦 Sprint 3: Validación y Despliegue
 **Fecha:** 26 de Octubre - 8 de Noviembre
-- [ ] `TT-12` Escribir Dockerfile en VS Code y dockerizar servicios web — *@Diego Oyarzo* (4 hrs)
+- [ ] `TT-10` Mapear los guiones de las cuatro etapas (encuesta, tabla de datos, interpretación y creación de gráficos) con los Objetivos de Aprendizaje de Datos de 3° básico — *@Diego Oyarzo* (4 hrs)
 - [ ] `TT-12` Configurar BD en producción y desplegar contenedores en servidor de pruebas — *@Diego Oyarzo* (6 hrs)
 - [ ] `TT-13` Ejecutar QA sobre encuesta, tabla, gráficos y modo proyección — *@Manuel Figueroa* (5 hrs)
 - [ ] `TT-13` Aplicar correcciones de código (bugfixing) a errores detectados — *@Manuel Figueroa* (5 hrs)
