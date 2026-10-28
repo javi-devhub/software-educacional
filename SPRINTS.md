@@ -16,15 +16,15 @@
 
 ### ⚡ Sprint 2: Dinamización e Interactividad
 **Fecha:** 12 de Octubre - 25 de Octubre
-- [ ] `TT-10` Mapear guiones de las 4 etapas con los OA de 3° básico — *@Diego Oyarzo* (4 hrs)
-- [ ] `HU-7` Programar lógica base y físicas en Phaser para encuesta y tabla de datos — *@Javiera Sobarzo* (8 hrs)
-- [ ] `HU-7` Integrar assets gráficos y textos en escenas de Phaser — *@Javiera Sobarzo* (5 hrs)
-- [ ] `HU-8` Desarrollar presentación de gráficos y preguntas de interpretación en Phaser — *@Manuel Figueroa* (8 hrs)
-- [ ] `EP-9` Diseñar e implementar animaciones y partículas de celebración — *@Javiera Sobarzo* (5 hrs)
-- [ ] `HU-11` Desarrollar componente de menú flotante rápido en Vue 3 — *@Manuel Figueroa* (4 hrs)
-- [ ] `HU-11` Sincronizar estado en Vue 3 con la instancia activa de Phaser — *@Javiera Sobarzo* (6 hrs)
-- [ ] `HU-15` Desarrollar mecánica drag & drop para construir gráficos en Phaser — *@Manuel Figueroa* (6 hrs)
-- [ ] `HU-15` Programar validación visual del gráfico y feedback inmediato — *@Diego Oyarzo* (4 hrs)
+- [ ] `TT-10` Mapear los guiones de las cuatro etapas (encuesta, tabla de datos, interpretación y creación de gráficos) con los Objetivos de Aprendizaje de Datos de 3° básico — *@Diego Oyarzo* (4 hrs)
+- [ ] `HU-7` Programar la lógica base y las físicas del motor de juego 2D (Phaser) para la encuesta y la tabla de datos (ordenar las respuestas en filas y columnas) — *@Javiera Sobarzo* (8 hrs)
+- [ ] `HU-7` Integrar los assets gráficos (imágenes, botones) y los textos dentro de las escenas de la encuesta y la tabla de datos — *@Javiera Sobarzo* (5 hrs)
+- [ ] `HU-8` Desarrollar la presentación de los gráficos y las preguntas de interpretación de la información (lectura y comparación de datos) utilizando Phaser — *@Manuel Figueroa* (8 hrs)
+- [ ] `EP-9` Diseñar e implementar las animaciones y partículas de celebración para las retroalimentaciones grupales — *@Javiera Sobarzo* (5 hrs)
+- [ ] `HU-11` Desarrollar el componente de menú flotante rápido utilizando Vue 3 — *@Manuel Figueroa* (4 hrs)
+- [ ] `HU-11` Sincronizar el estado del componente en Vue 3 con la instancia activa de Phaser para transiciones sin recargar el navegador — *@Javiera Sobarzo* (6 hrs)
+- [ ] `HU-15` Desarrollar la mecánica para que el curso construya un gráfico a partir de una tabla de datos (arrastrar y soltar barras o íconos) utilizando Phaser — *@Manuel Figueroa* (6 hrs)
+- [ ] `HU-15` Programar la validación visual del gráfico creado frente a los datos entregados y su retroalimentación inmediata — *@Diego Oyarzo* (4 hrs)
 
 ### 📦 Sprint 3: Validación y Despliegue
 **Fecha:** 26 de Octubre - 8 de Noviembre
