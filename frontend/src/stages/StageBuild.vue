@@ -1,14 +1,40 @@
 <script setup>
 import { computed } from 'vue'
 import BarChart from '../components/BarChart.vue'
-import { datosDeportes } from '../data/activity'
+import { datosDeportes as datosEstaticos } from '../data/activity'
 import { useAppStore } from '../stores/app'
 
 const store = useAppStore()
 const s = computed(() => store.session)
-// El gráfico que va armando el curso
-const items = computed(() => datosDeportes.items.map((d) => ({ ...d, value: s.value.chart[d.key] })))
-const labelOf = (key) => datosDeportes.items.find((d) => d.key === key).label
+
+const datosActividad = computed(() => {
+  const act = store.actividadActual
+  if (act && act.datos && act.datos.filas) {
+    const maximo = Math.max(...act.datos.filas.map(f => f.total || f.cantidad || 0), 8)
+    return {
+      titulo: act.datos.titulo || act.titulo,
+      max: maximo,
+      items: act.datos.filas.map(f => ({
+        key: f.categoria.toLowerCase().replace(/\s+/g, '_'),
+        emoji: '📊',
+        label: f.categoria,
+        value: f.total || f.cantidad || 0
+      }))
+    }
+  }
+  return datosEstaticos
+})
+
+// El gráfico que va armando el curso con los botones
+const items = computed(() => {
+  if (!s.value || !s.value.chart) return []
+  return datosActividad.value.items.map((d) => ({
+    ...d,
+    value: s.value.chart[d.key] || 0
+  }))
+})
+
+const labelOf = (key) => datosActividad.value.items.find((d) => d.key === key)?.label || key
 </script>
 
 <template>
@@ -17,15 +43,24 @@ const labelOf = (key) => datosDeportes.items.find((d) => d.key === key).label
     <p class="help">Usen la tabla para construir el gráfico de barras. Suban o bajen cada barra con los botones.</p>
     <div class="grid">
       <div>
-      <h3 class="cap">{{ datosDeportes.titulo }}</h3>
-      <table class="tabla">
-        <thead><tr><th>Deporte</th><th>Estudiantes</th></tr></thead>
-        <tbody>
-          <tr v-for="d in datosDeportes.items" :key="d.key"><td>{{ d.emoji }} {{ d.label }}</td><td class="n">{{ d.value }}</td></tr>
-        </tbody>
-      </table>
+        <h3 class="cap">{{ datosActividad.titulo }}</h3>
+        <table class="tabla">
+          <thead><tr><th>Categoría</th><th>Cantidad</th></tr></thead>
+          <tbody>
+            <tr v-for="d in datosActividad.items" :key="d.key">
+              <td>{{ d.emoji }} {{ d.label }}</td>
+              <td class="n">{{ d.value }}</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <BarChart :items="items" :max="datosDeportes.max" title="Nuestro gráfico" :height="190" :wrong="s.checked && !s.checked.ok ? s.checked.wrong : []">
+      <BarChart 
+        :items="items" 
+        :max="datosActividad.max" 
+        title="Nuestro gráfico" 
+        :height="210" 
+        :wrong="s.checked && !s.checked.ok ? s.checked.wrong : []"
+      >
         <template #foot="{ item }">
           <span class="ctl">
             <button class="step" :aria-label="'Bajar ' + item.label" @click="store.setBar(item.key, -1)">▼</button>
@@ -46,7 +81,7 @@ const labelOf = (key) => datosDeportes.items.find((d) => d.key === key).label
 <style scoped>
 h2 { font-size: 30px; margin-bottom: 4px; }
 .help { font-size: 19px; color: var(--text-muted); margin-bottom: 14px; }
-.grid { display: grid; grid-template-columns: 300px 1fr; gap: 22px; align-items: start; }
+.grid { display: grid; grid-template-columns: 320px 1fr; gap: 22px; align-items: start; }
 .tabla { width: 100%; border-collapse: separate; border-spacing: 0; border: 3px solid var(--text-main); border-radius: 14px; overflow: hidden; font-size: 20px; }
 .cap { font: 700 19px var(--font-title); margin-bottom: 6px; }
 th { background: var(--text-main); color: #fff; text-align: left; padding: 8px 12px; font-weight: 800; font-size: 17px; }

@@ -9,10 +9,9 @@ nickname = "docente_prueba"
 contrasena = getpass("Contraseña de la docente: ")
 rol = "docente"
 
-contrasena_hash = bcrypt.hashpw(
-    contrasena.encode("utf-8"),
-    bcrypt.gensalt()
-).decode("utf-8")
+contrasena_hash = bcrypt.hashpw(contrasena.encode("utf-8"), bcrypt.gensalt()).decode(
+    "utf-8"
+)
 
 conexion = get_connection()
 cursor = conexion.cursor()
@@ -22,10 +21,7 @@ INSERT INTO docente (nombre, nickname, contrasena_hash, rol)
 VALUES (%s, %s, %s, %s)
 """
 
-cursor.execute(
-    sql,
-    (nombre, nickname, contrasena_hash, rol)
-)
+cursor.execute(sql, (nombre, nickname, contrasena_hash, rol))
 
 conexion.commit()
 

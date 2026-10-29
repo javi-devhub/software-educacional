@@ -32,15 +32,30 @@ export const useAppStore = defineStore('app', {
     docente: load('docente', null), // { id_docente, nombre, nickname, rol } tras iniciar sesión (HU-1)
     curso: '3° básico',
     readSize: load('readSize', 22),
-    ultimaEtapa: load('ultimaEtapa', null), // solo la última etapa proyectada; no hay registro de desempeño
-    session: null // estado global de la actividad proyectada (HU-6)
+    ultimaEtapa: load('ultimaEtapa', null), // última etapa proyectada
+    session: null, // estado global de la actividad proyectada (HU-6)
+
+    // === ESTADO SPRINT 2: ACTIVIDADES CAPÍTULO 11 ===
+    actividades: [], // lista descargada desde GET /actividades
+    actividadActual: null, // actividad seleccionada activa
+    seccionSeleccionada: null, // filtro: 'Tablas', 'Pictogramas', 'Gráficos de barra', etc.
+    cargandoActividades: false,
+    errorActividades: null
   }),
+
   getters: {
     isAuth: (state) => !!state.docente,
-    doneCount: (state) => (state.session ? Object.keys(state.session.done).length : 0)
+    doneCount: (state) => (state.session ? Object.keys(state.session.done).length : 0),
+    
+    // Lista de actividades filtradas por sección actual en el store
+    actividadesFiltradas: (state) => {
+      if (!state.seccionSeleccionada) return state.actividades
+      return state.actividades.filter((a) => a.seccion === state.seccionSeleccionada)
+    }
   },
+
   actions: {
-    // Autenticación (HU-1): llama al endpoint POST /login del backend
+    // Autenticación (HU-1)
     async login(nickname, contrasena) {
       let res
       try {
@@ -59,79 +74,190 @@ export const useAppStore = defineStore('app', {
       this.docente = data.docente
       save('docente', data.docente)
     },
+
     logout() {
       this.docente = null
       this.session = null
+      this.actividadActual = null
       remove('docente')
     },
+
     setReadSize(px) {
       this.readSize = px
       save('readSize', px)
     },
+
+    // =====================================================================
+    // ACCIONES SPRINT 2: CONSUMO DE API Y CARGA DINÁMICA
+    // =====================================================================
+    async fetchActividades(seccion = null) {
+      this.cargandoActividades = true
+      this.errorActividades = null
+      this.seccionSeleccionada = seccion
+
+      const url = seccion
+        ? `${API_URL}/actividades?seccion=${encodeURIComponent(seccion)}`
+        : `${API_URL}/actividades`
+
+      try {
+        const res = await fetch(url)
+        if (!res.ok) throw new Error('Error al consultar las actividades.')
+        this.actividades = await res.json()
+      } catch (err) {
+        this.errorActividades = err.message || 'Error de conexión con el backend'
+      } finally {
+        this.cargandoActividades = false
+      }
+    },
+
+    // Selecciona una actividad de la BD y la monta dinámicamente en session
+    setActividad(actividad) {
+      this.actividadActual = actividad
+
+      // Mapear según el tipo de contenido/mecánica
+      const datos = actividad.datos || {}
+      const filas = datos.filas || []
+
+      // Inicializar votos o barras según los datos traídos de la base de datos
+      const votosDinamicos = {}
+      filas.forEach((f) => {
+        const key = f.categoria.toLowerCase().replace(/\s+/g, '_')
+        votosDinamicos[key] = f.total || f.cantidad || 0
+      })
+
+      // Si no hay sesión activa, inicializarla
+      if (!this.session) {
+        this.launch('encuesta')
+      }
+
+      // Inyectar datos en la sesión activa
+      this.session.votes = { ...votosDinamicos }
+      this.session.actividadId = actividad.id_contenido
+      this.session.tituloActividad = actividad.titulo
+      this.session.datosActividad = datos
+    },
+
+    // Lanzar proyección (HU-4 / HU-6)
     launch(id = 'encuesta') {
       const i = Math.max(0, etapaIndex(id))
       this.ultimaEtapa = etapas[i].id
       save('ultimaEtapa', this.ultimaEtapa)
       this.session = {
-        i, paused: false, finished: false, done: {},
-        votes: zeros(encuesta.opciones), sortDesc: false, // etapa 1
+        i,
+        paused: false,
+        finished: false,
+        done: {},
+        votes: zeros(encuesta.opciones),
+        sortDesc: false, // etapa 1
         seen: {}, // etapa 2
-        quiz: {}, qi: 0, // etapa 3
-        chart: zeros(datosDeportes.items), checked: null // etapa 4
+        quiz: {},
+        qi: 0, // etapa 3
+        chart: zeros(datosDeportes.items),
+        checked: null // etapa 4
       }
     },
+
     goTo(i) {
       this.session.i = Math.min(Math.max(i, 0), etapas.length - 1)
       this.ultimaEtapa = etapas[this.session.i].id
       save('ultimaEtapa', this.ultimaEtapa)
     },
-    // Etapa 1
+
+    // Etapa 1: Encuesta y tabla
     vote(key) {
-      this.session.votes[key]++
+      this.session.votes[key] = (this.session.votes[key] || 0) + 1
       this.session.done[0] = true
     },
+
     loadSample() {
-      this.session.votes = { ...encuesta.ejemplo }
+      // Si hay una actividad de BD cargada con filas, usar sus datos como muestra
+      if (this.actividadActual?.datos?.filas) {
+        const muestra = {}
+        this.actividadActual.datos.filas.forEach((f) => {
+          const key = f.categoria.toLowerCase().replace(/\s+/g, '_')
+          muestra[key] = f.total || f.cantidad || 0
+        })
+        this.session.votes = muestra
+      } else {
+        this.session.votes = { ...encuesta.ejemplo }
+      }
       this.session.done[0] = true
     },
+
     resetVotes() {
-      this.session.votes = zeros(encuesta.opciones)
+      if (this.actividadActual?.datos?.filas) {
+        const vacio = {}
+        this.actividadActual.datos.filas.forEach((f) => {
+          const key = f.categoria.toLowerCase().replace(/\s+/g, '_')
+          vacio[key] = 0
+        })
+        this.session.votes = vacio
+      } else {
+        this.session.votes = zeros(encuesta.opciones)
+      }
       delete this.session.done[0]
     },
+
     toggleSort() {
       this.session.sortDesc = !this.session.sortDesc
     },
-    // Etapa 2
+
+    // Etapa 2: Conocimiento de gráficos
     seeChart(tipo) {
       const s = this.session
       s.seen[tipo] = true
       if (s.seen.pictograma && s.seen.barras) s.done[1] = true
     },
-    // Etapa 3
+
+    // Etapa 3: Interpretación
     answerQuiz(q, option) {
       const s = this.session
       if (s.quiz[q]?.ok) return
-      s.quiz[q] = { sel: option, ok: !!preguntas[q].options[option][2] }
-      if (preguntas.every((_, k) => s.quiz[k]?.ok)) s.done[2] = true
+
+      // Si la actividad actual tiene preguntas en su JSON, evaluar con ellas
+      const preguntasActuales = this.actividadActual?.datos?.preguntas || preguntas
+      const preg = preguntasActuales[q]
+      const esCorrecta = Array.isArray(preg.options)
+        ? !!preg.options[option][2]
+        : preg.r === option || preg.respuesta === option
+
+      s.quiz[q] = { sel: option, ok: esCorrecta }
+      if (preguntasActuales.every((_, k) => s.quiz[k]?.ok)) s.done[2] = true
     },
+
     setQuestion(q) {
       this.session.qi = q
     },
-    // Etapa 4
+
+    // Etapa 4: Creación de gráficos
     setBar(key, delta) {
       const s = this.session
-      s.chart[key] = Math.min(datosDeportes.max, Math.max(0, s.chart[key] + delta))
+      const maxVal = this.actividadActual?.datos?.escala_eje ? this.actividadActual.datos.escala_eje * 10 : datosDeportes.max
+      s.chart[key] = Math.min(maxVal, Math.max(0, (s.chart[key] || 0) + delta))
       s.checked = null
     },
+
     checkChart() {
       const s = this.session
-      const wrong = datosDeportes.items.filter((d) => s.chart[d.key] !== d.value).map((d) => d.key)
+      const itemsObjetivo = this.actividadActual?.datos?.filas
+        ? this.actividadActual.datos.filas.map((f) => ({
+            key: f.categoria.toLowerCase().replace(/\s+/g, '_'),
+            value: f.total || f.cantidad || 0
+          }))
+        : datosDeportes.items
+
+      const wrong = itemsObjetivo
+        .filter((d) => (s.chart[d.key] || 0) !== d.value)
+        .map((d) => d.key)
+
       s.checked = { ok: wrong.length === 0, wrong }
       if (s.checked.ok) s.done[3] = true
     },
+
     togglePause() {
       this.session.paused = !this.session.paused
     },
+
     restart() {
       this.launch('encuesta')
     }
