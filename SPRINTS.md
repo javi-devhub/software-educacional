@@ -19,10 +19,10 @@
 - [x] `HU-7` Programar la lógica base y las físicas del motor de juego 2D (Phaser) para la encuesta y la tabla de datos (ordenar las respuestas en filas y columnas) — *@Javiera Sobarzo* (8 hrs)
 - [x] `HU-7` Integrar los assets gráficos (imágenes, botones) y los textos dentro de las escenas de la encuesta y la tabla de datos — *@Javiera Sobarzo* (5 hrs)
 - [x] `HU-8` Desarrollar la presentación de los gráficos y las preguntas de interpretación de la información (lectura y comparación de datos) utilizando Phaser — *@Manuel Figueroa* (8 hrs)
-- [ ] `EP-9` Diseñar e implementar las animaciones y partículas de celebración para las retroalimentaciones grupales — *@Javiera Sobarzo* (5 hrs)
+- [x] `EP-9` Diseñar e implementar las animaciones y partículas de celebración para las retroalimentaciones grupales — *@Javiera Sobarzo* (5 hrs)
 - [x] `HU-11` Desarrollar el componente de menú flotante rápido utilizando Vue 3 — *@Manuel Figueroa* (4 hrs)
 - [x] `HU-11` Sincronizar el estado del componente en Vue 3 con la instancia activa de Phaser para transiciones sin recargar el navegador — *@Javiera Sobarzo* (6 hrs)
-- [ ] `HU-15` Desarrollar la mecánica para que el curso construya un gráfico a partir de una tabla de datos (arrastrar y soltar barras o íconos) utilizando Phaser — *@Manuel Figueroa* (6 hrs)
+- [x] `HU-15` Desarrollar la mecánica para que el curso construya un gráfico a partir de una tabla de datos (arrastrar y soltar barras o íconos) utilizando Phaser — *@Manuel Figueroa* (6 hrs)
 - [x] `HU-15` Programar la validación visual del gráfico creado frente a los datos entregados y su retroalimentación inmediata — *@Diego Oyarzo* (4 hrs)
 
 ### 📦 Sprint 3: Validación y Despliegue

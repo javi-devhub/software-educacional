@@ -3,6 +3,8 @@ export type SeccionCapitulo11 =
   | 'Pictogramas' 
   | 'Gráficos de barra' 
   | 'Interpretar gráficos' 
+  | 'Diagramas de puntos'
+  | 'Experimentos aleatorios'
   | 'Cierre';
 
 export interface FilaDato {

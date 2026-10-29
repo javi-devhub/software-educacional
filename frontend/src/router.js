@@ -24,7 +24,7 @@ const router = createRouter({
 })
 
 // Guarda de navegación: protege las rutas privadas y mantiene coherente la sesión de proyección.
-router.beforeEach((to) => {
+router.beforeEach(async (to) => {
   const store = useAppStore()
 
   // Sin sesión: todo redirige al login recordando a dónde quería ir
@@ -38,7 +38,17 @@ router.beforeEach((to) => {
     // Etapa inexistente en la URL: vuelve al inicio
     if (etapaIndex(to.params.etapa) === -1) return { name: 'inicio' }
     // Entrada directa o recarga (F5): recrea la sesión de actividad para que las etapas no fallen
-    if (!store.session) store.launch(to.params.etapa)
+    if (to.query.actividad) {
+      const id = Number(to.query.actividad)
+      if (store.actividadActual?.id_contenido !== id) {
+        if (!store.actividades.length) await store.fetchActividades()
+        const actividad = store.actividades.find(a => a.id_contenido === id)
+        if (!actividad) return { name: 'inicio' }
+        store.setActividad(actividad, to.params.etapa)
+      }
+    } else if (!store.session || store.actividadActual) {
+      store.launch(to.params.etapa)
+    }
   }
 })
 

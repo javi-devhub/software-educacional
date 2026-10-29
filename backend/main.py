@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from database import get_connection
 from schemas import ActividadResponse, LoginRequest
+from actividades import preparar_actividades
 
 # Configuración de CORS
 origins = [
@@ -96,130 +97,37 @@ def login(datos: LoginRequest):
 # =====================================================================
 
 
-@app.get("/actividades", response_model=List[ActividadResponse])
-def listar_actividades(seccion: Optional[str] = None):
-    """
-    Retorna la lista de actividades del Capítulo 11.
-    Permite filtrar opcionalmente por sección mediante query param:
-    /actividades?seccion=Tablas
-    /actividades?seccion=Pictogramas
-    /actividades?seccion=Gráficos de barra
-    /actividades?seccion=Interpretar gráficos
-    /actividades?seccion=Cierre
-    """
+def catalogo_actividades():
     conexion = get_connection()
     cursor = conexion.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT c.id_contenido, c.titulo, c.descripcion, c.recurso, c.estado,
+                   tc.nombre_tipo AS tipo_etapa,
+                   GROUP_CONCAT(DISTINCT oa.codigo_oa ORDER BY oa.codigo_oa SEPARATOR ', ') AS oas
+            FROM contenido c
+            INNER JOIN tipo_contenido tc ON c.id_tipo = tc.id_tipo
+            LEFT JOIN contenido_oa coa ON c.id_contenido = coa.id_contenido
+            LEFT JOIN objetivo_aprendizaje oa ON coa.id_oa = oa.id_oa
+            WHERE c.estado = 'activo' AND JSON_VALID(c.recurso)
+              AND JSON_EXTRACT(c.recurso, '$.capitulo') = 11
+            GROUP BY c.id_contenido, c.titulo, c.descripcion, c.recurso, c.estado, tc.nombre_tipo
+        """)
+        return preparar_actividades(cursor.fetchall())
+    finally:
+        cursor.close()
+        conexion.close()
 
-    query = """
-        SELECT 
-            c.id_contenido,
-            c.titulo,
-            c.descripcion,
-            c.recurso,
-            tc.nombre_tipo AS tipo_etapa,
-            COALESCE(GROUP_CONCAT(oa.codigo_oa ORDER BY oa.codigo_oa SEPARATOR ', '), '') AS oas
-        FROM contenido c
-        INNER JOIN tipo_contenido tc ON c.id_tipo = tc.id_tipo
-        LEFT JOIN contenido_oa coa ON c.id_contenido = coa.id_contenido
-        LEFT JOIN objetivo_aprendizaje oa ON coa.id_oa = oa.id_oa
-        WHERE JSON_VALID(c.recurso) 
-          AND JSON_EXTRACT(c.recurso, '$.capitulo') = 11
-    """
-    params = []
 
-    if seccion:
-        query += " AND JSON_UNQUOTE(JSON_EXTRACT(c.recurso, '$.seccion')) = %s"
-        params.append(seccion)
-
-    query += (
-        " GROUP BY c.id_contenido, c.titulo, c.descripcion, c.recurso, tc.nombre_tipo"
-    )
-    query += " ORDER BY c.id_contenido ASC"
-
-    cursor.execute(query, tuple(params))
-    filas = cursor.fetchall()
-
-    cursor.close()
-    conexion.close()
-
-    resultado = []
-    for fila in filas:
-        recurso_obj = (
-            json.loads(fila["recurso"])
-            if isinstance(fila["recurso"], str)
-            else fila["recurso"]
-        )
-
-        resultado.append(
-            ActividadResponse(
-                id_contenido=fila["id_contenido"],
-                titulo=fila["titulo"],
-                descripcion=fila["descripcion"],
-                seccion=recurso_obj.get("seccion", "General"),
-                tipo_mecanica=recurso_obj.get("tipo_mecanica"),
-                pagina=recurso_obj.get("pagina"),
-                datos=recurso_obj.get("datos", {}),
-                tipo_etapa=fila["tipo_etapa"],
-                oa_asociados=[oa.strip() for oa in fila["oas"].split(",") if oa.strip()]
-                if fila["oas"]
-                else [],
-            )
-        )
-
-    return resultado
+@app.get("/actividades", response_model=List[ActividadResponse])
+def listar_actividades(seccion: Optional[str] = None):
+    actividades = catalogo_actividades()
+    return [a for a in actividades if not seccion or a.seccion == seccion]
 
 
 @app.get("/actividades/{id_contenido}", response_model=ActividadResponse)
 def obtener_actividad(id_contenido: int):
-    """
-    Retorna una actividad específica por su ID con todos sus datos listos para
-    ser consumidos por la escena de Phaser o el componente en Vue 3.
-    """
-    conexion = get_connection()
-    cursor = conexion.cursor(dictionary=True)
-
-    cursor.execute(
-        """
-        SELECT 
-            c.id_contenido,
-            c.titulo,
-            c.descripcion,
-            c.recurso,
-            tc.nombre_tipo AS tipo_etapa,
-            COALESCE(GROUP_CONCAT(oa.codigo_oa ORDER BY oa.codigo_oa SEPARATOR ', '), '') AS oas
-        FROM contenido c
-        INNER JOIN tipo_contenido tc ON c.id_tipo = tc.id_tipo
-        LEFT JOIN contenido_oa coa ON c.id_contenido = coa.id_contenido
-        LEFT JOIN objetivo_aprendizaje oa ON coa.id_oa = oa.id_oa
-        WHERE c.id_contenido = %s
-        GROUP BY c.id_contenido, c.titulo, c.descripcion, c.recurso, tc.nombre_tipo
-        """,
-        (id_contenido,),
-    )
-    fila = cursor.fetchone()
-
-    cursor.close()
-    conexion.close()
-
-    if not fila:
-        raise HTTPException(status_code=404, detail="Actividad no encontrada")
-
-    recurso_obj = (
-        json.loads(fila["recurso"])
-        if isinstance(fila["recurso"], str)
-        else fila["recurso"]
-    )
-
-    return ActividadResponse(
-        id_contenido=fila["id_contenido"],
-        titulo=fila["titulo"],
-        descripcion=fila["descripcion"],
-        seccion=recurso_obj.get("seccion", "General"),
-        tipo_mecanica=recurso_obj.get("tipo_mecanica"),
-        pagina=recurso_obj.get("pagina"),
-        datos=recurso_obj.get("datos", {}),
-        tipo_etapa=fila["tipo_etapa"],
-        oa_asociados=[oa.strip() for oa in fila["oas"].split(",") if oa.strip()]
-        if fila["oas"]
-        else [],
-    )
+    for actividad in catalogo_actividades():
+        if actividad.id_contenido == id_contenido:
+            return actividad
+    raise HTTPException(status_code=404, detail="Actividad no encontrada")

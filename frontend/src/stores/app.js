@@ -90,20 +90,20 @@ export const useAppStore = defineStore('app', {
     // =====================================================================
     // ACCIONES SPRINT 2: CONSUMO DE API Y CARGA DINÁMICA
     // =====================================================================
-    async fetchActividades(seccion = null) {
+    async fetchActividades(seccion = this.seccionSeleccionada) {
       this.cargandoActividades = true
       this.errorActividades = null
       this.seccionSeleccionada = seccion
 
-      const url = seccion
-        ? `${API_URL}/actividades?seccion=${encodeURIComponent(seccion)}`
-        : `${API_URL}/actividades`
+      // Conservar el catálogo completo permite cambiar de filtro sin perder secciones.
+      const url = `${API_URL}/actividades`
 
       try {
         const res = await fetch(url)
         if (!res.ok) throw new Error('Error al consultar las actividades.')
         this.actividades = await res.json()
       } catch (err) {
+        this.actividades = []
         this.errorActividades = err.message || 'Error de conexión con el backend'
       } finally {
         this.cargandoActividades = false
@@ -111,7 +111,8 @@ export const useAppStore = defineStore('app', {
     },
 
     // Selecciona una actividad de la BD y la monta dinámicamente en session
-    setActividad(actividad) {
+    setActividad(actividad, etapa = 'encuesta') {
+      this.launch(etapa)
       this.actividadActual = actividad
 
       // Mapear según el tipo de contenido/mecánica
@@ -139,6 +140,7 @@ export const useAppStore = defineStore('app', {
 
     // Lanzar proyección (HU-4 / HU-6)
     launch(id = 'encuesta') {
+      this.actividadActual = null
       const i = Math.max(0, etapaIndex(id))
       this.ultimaEtapa = etapas[i].id
       save('ultimaEtapa', this.ultimaEtapa)
@@ -259,6 +261,10 @@ export const useAppStore = defineStore('app', {
     },
 
     restart() {
+      if (this.actividadActual) {
+        this.setActividad(this.actividadActual, etapas[this.session.i].id)
+        return
+      }
       this.launch('encuesta')
     }
   }

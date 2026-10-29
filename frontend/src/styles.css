@@ -57,3 +57,8 @@ button { font-family: inherit; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
+/* Espacio cálido para explorar las misiones del aula. */
+body { background: #fcf9f1; }
+button, a, input[type=range] { -webkit-tap-highlight-color: transparent; }
+button:focus-visible, input:focus-visible, select:focus-visible { outline: 3px solid #3d2866; outline-offset: 4px; }
