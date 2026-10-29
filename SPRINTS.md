@@ -27,7 +27,7 @@
 
 ### 📦 Sprint 3: Validación y Despliegue
 **Fecha:** 26 de Octubre - 8 de Noviembre
-- [ ] `TT-10` Mapear los guiones de las cuatro etapas (encuesta, tabla de datos, interpretación y creación de gráficos) con los Objetivos de Aprendizaje de Datos de 3° básico — *@Diego Oyarzo* (4 hrs)
+- [x] `TT-10` Mapear los guiones de las cuatro etapas (encuesta, tabla de datos, interpretación y creación de gráficos) con los Objetivos de Aprendizaje de Datos de 3° básico — *@Diego Oyarzo* (4 hrs)
 - [ ] `TT-12` Configurar BD en producción y desplegar contenedores en servidor de pruebas — *@Diego Oyarzo* (6 hrs)
 - [ ] `TT-13` Ejecutar QA sobre encuesta, tabla, gráficos y modo proyección — *@Manuel Figueroa* (5 hrs)
 - [ ] `TT-13` Aplicar correcciones de código (bugfixing) a errores detectados — *@Manuel Figueroa* (5 hrs)
