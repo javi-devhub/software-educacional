@@ -1,13 +1,20 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { answerChoices } from '../data/playful'
+import { useAppStore } from '../stores/app'
 
-const props = defineProps({ questions: { type: Array, required: true } })
-const current = ref(0)
-const solved = ref({})
-const selected = ref(null)
-const hint = ref(false)
-const complete = ref(false)
+const props = defineProps({
+  questions: { type: Array, required: true },
+  progressKey: { type: String, default: 'quiz' }
+})
+const store = useAppStore()
+const activityId = store.actividadActual?.id_contenido
+const saved = activityId ? store.getChapterProgress(activityId).quizzes?.[props.progressKey] || {} : {}
+const current = ref(saved.current || 0)
+const solved = ref(saved.solved || {})
+const selected = ref(saved.selected ?? null)
+const hint = ref(saved.hint || false)
+const complete = ref(saved.complete || false)
 const question = computed(() => props.questions[current.value])
 const choices = computed(() => answerChoices(question.value.answer, current.value))
 const correct = computed(() => !!solved.value[current.value])
@@ -30,6 +37,27 @@ function reset() {
   selected.value = null
   hint.value = false
 }
+
+watch(
+  [current, solved, selected, hint, complete],
+  () => {
+    if (!activityId) return
+    const progress = store.getChapterProgress(activityId)
+    store.saveChapterProgress(activityId, {
+      quizzes: {
+        ...progress.quizzes,
+        [props.progressKey]: {
+          current: current.value,
+          solved: solved.value,
+          selected: selected.value,
+          hint: hint.value,
+          complete: complete.value
+        }
+      }
+    })
+  },
+  { deep: true, flush: 'sync' }
+)
 </script>
 
 <template>

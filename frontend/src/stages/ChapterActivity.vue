@@ -1,30 +1,33 @@
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import ActivityGraph from '../components/ActivityGraph.vue'
 import QuizChallenge from '../components/QuizChallenge.vue'
 import { themeFor, emojiFor } from '../data/playful'
+import { useAppStore } from '../stores/app'
 
 const props = defineProps({ actividad: { type: Object, required: true } })
+const store = useAppStore()
+const saved = store.getChapterProgress(props.actividad.id_contenido)
 const d = computed(() => props.actividad.datos)
 const theme = computed(() => themeFor(props.actividad.seccion))
-const lastRoll = ref(null)
-const voteHistory = ref([])
-const flipped = ref({})
-const buildingHint = ref(false)
+const lastRoll = ref(saved.lastRoll || null)
+const voteHistory = ref(saved.voteHistory || [])
+const flipped = ref(saved.flipped || {})
+const buildingHint = ref(saved.buildingHint || false)
 const isBuild = computed(() => props.actividad.tipo_etapa === 'Creación de gráficos')
-const surveyIndex = ref(0)
-const customQuestions = ref({})
-const customOptionsBySurvey = ref(Array.from({ length: d.value.num_encuestas || 1 }, () => ['', '', '', '']))
+const surveyIndex = ref(saved.surveyIndex || 0)
+const customQuestions = ref(saved.customQuestions || {})
+const customOptionsBySurvey = ref(saved.customOptionsBySurvey || Array.from({ length: d.value.num_encuestas || 1 }, () => ['', '', '', '']))
 const customQuestion = computed({
   get: () => customQuestions.value[surveyIndex.value] || '',
   set: value => { customQuestions.value[surveyIndex.value] = value }
 })
 const customOptions = computed(() => customOptionsBySurvey.value[surveyIndex.value])
-const counts = ref({})
-const checked = ref(false)
-const symbolScale = ref(d.value.valor_simbolo || 1)
-const graphType = ref(d.value.tipo_grafico)
-const orientation = ref(d.value.orientacion || 'vertical')
+const counts = ref(saved.counts || {})
+const checked = ref(saved.checked || false)
+const symbolScale = ref(saved.symbolScale || d.value.valor_simbolo || 1)
+const graphType = ref(saved.graphType || d.value.tipo_grafico)
+const orientation = ref(saved.orientation || d.value.orientacion || 'vertical')
 const surveys = computed(() => d.value.encuestas || (d.value.preguntas || []).filter(p => p.opciones))
 const isCustom = computed(() => !!(d.value.alternativas_por_pregunta || d.value.num_opciones))
 const isSurvey = computed(() => isCustom.value || surveys.value.length > 0 || d.value.opciones || d.value.moneda || d.value.dados)
@@ -108,6 +111,27 @@ const puzzleQuestions = computed(() => [
   { text: '¿Cuántas cartas tiene Josefa?', answer: 15, hint: 'Entre Josefa y Matías tienen 20 cartas. Josefa tiene 10 más que Matías.' },
   { text: '¿Cuántas cartas tiene Matías?', answer: 5, hint: 'Sumen las cartas conocidas y resten esa suma de 75. Repartan lo que queda usando la pista.' }
 ])
+
+watch(
+  [lastRoll, voteHistory, flipped, buildingHint, surveyIndex, customQuestions, customOptionsBySurvey, counts, checked, symbolScale, graphType, orientation],
+  () => {
+    store.saveChapterProgress(props.actividad.id_contenido, {
+      lastRoll: lastRoll.value,
+      voteHistory: voteHistory.value,
+      flipped: flipped.value,
+      buildingHint: buildingHint.value,
+      surveyIndex: surveyIndex.value,
+      customQuestions: customQuestions.value,
+      customOptionsBySurvey: customOptionsBySurvey.value,
+      counts: counts.value,
+      checked: checked.value,
+      symbolScale: symbolScale.value,
+      graphType: graphType.value,
+      orientation: orientation.value
+    })
+  },
+  { deep: true, flush: 'sync' }
+)
 </script>
 
 <template>
@@ -198,8 +222,8 @@ const puzzleQuestions = computed(() => [
       <p>Total de niños registrados: {{ Object.values(counts).reduce((a, n) => a + (Number(n) || 0), 0) }}</p>
     </div>
 
-    <div v-if="d.simbolos_conocidos" class="puzzle-intro"><p>🃏 Total: {{ d.total_cartas }} cartas. {{ d.condicion }}. Cada símbolo representa {{ d.valor_simbolo }} cartas.</p><QuizChallenge :questions="puzzleQuestions" /></div>
-    <QuizChallenge v-if="questions.length && !d.simbolos_conocidos" :questions="questions" />
+    <div v-if="d.simbolos_conocidos" class="puzzle-intro"><p>🃏 Total: {{ d.total_cartas }} cartas. {{ d.condicion }}. Cada símbolo representa {{ d.valor_simbolo }} cartas.</p><QuizChallenge progress-key="puzzle" :questions="puzzleQuestions" /></div>
+    <QuizChallenge v-if="questions.length && !d.simbolos_conocidos" progress-key="activity" :questions="questions" />
     <label v-if="d.num_preguntas_a_inventar" class="reflection">Inventen y respondan {{ d.num_preguntas_a_inventar }} preguntas sobre estos datos.<textarea rows="4" /></label>
   </section>
 </template>

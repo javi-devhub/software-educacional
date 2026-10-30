@@ -113,11 +113,7 @@ function responder(opcion) {
   const indexPregunta = s.value?.qi || 0
   const esCorrecta = opcion[2] === true
   
-  if (!store.session.quiz) store.session.quiz = {}
-  store.session.quiz[indexPregunta] = {
-    selText: opcion[1],
-    ok: esCorrecta
-  }
+  store.answerQuizText(indexPregunta, opcion[1], esCorrecta)
 }
 </script>
 
